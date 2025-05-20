@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
-// ฟังก์ชันสำหรับสร้าง HTML จาก Mermaid Diagram
+// Function to generate HTML from a Mermaid Diagram
 function generateHTMLFromMermaid(mmdContent, scalePercentage = 100) {
   const scaleFactor = scalePercentage / 100;
   return `
@@ -25,7 +25,7 @@ function generateHTMLFromMermaid(mmdContent, scalePercentage = 100) {
         #container {
           display: inline-block;
           transform: scale(${scaleFactor});
-          transform-origin:  buttom right; 
+          transform-origin: bottom right; 
         }
       </style>
     </head>
@@ -43,38 +43,38 @@ function generateHTMLFromMermaid(mmdContent, scalePercentage = 100) {
   `;
 }
 
-// ฟังก์ชันสำหรับแปลง HTML เป็น PDF โดยปรับขนาดเนื้อหาและจัดให้อยู่ตรงกลาง
+// Function to convert HTML to PDF by scaling the content and centering it
 async function convertHTMLToPDF(htmlContent, outputPDF, scalePercentage = 100) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  // โหลด HTML
+  // Load the HTML content
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-  // คำนวณขนาดของเนื้อหา
+  // Calculate the size of the content
   const contentSize = await page.evaluate(() => {
     const container = document.querySelector('#container');
     const { width, height } = container.getBoundingClientRect();
     return { width, height };
   });
 
-  // ปรับขนาดพื้นที่ PDF ตามเนื้อหาที่ถูกขยาย/ย่อ
+  // Adjust the PDF dimensions based on the scaled content
   const scaleFactor = scalePercentage / 100;
   const scaledWidth = contentSize.width * scaleFactor;
   const scaledHeight = contentSize.height * scaleFactor;
 
-  // เพิ่มขอบเขต (Margin) เพื่อให้ Content อยู่ตรงกลาง
-  const margin = 20; // ขอบเขต 20px รอบด้าน
+  // Add margins to center the content
+  const margin = 20; // 20px margin on all sides
   const pdfWidth = scaledWidth + margin * 2;
   const pdfHeight = scaledHeight + margin * 2;
 
-  // ตั้งค่าขนาดของ Viewport ให้ตรงกับขนาด PDF
+  // Set the viewport size to match the PDF dimensions
   await page.setViewport({
     width: Math.ceil(pdfWidth),
     height: Math.ceil(pdfHeight),
   });
 
-  // สร้าง PDF โดยใช้ขนาดที่ปรับแล้ว
+  // Generate the PDF with the adjusted dimensions
   await page.pdf({
     path: outputPDF,
     width: `${pdfWidth}px`,
@@ -91,7 +91,7 @@ async function convertHTMLToPDF(htmlContent, outputPDF, scalePercentage = 100) {
   await browser.close();
 }
 
-// ฟังก์ชันหลักสำหรับแปลงไฟล์ .mmd เป็น PDF
+// Main function to convert .mmd files to PDF
 async function convertMMDToPDF(inputPath, scalePercentage = 100) {
   const isDirectory = fs.lstatSync(inputPath).isDirectory();
   const files = isDirectory
@@ -116,7 +116,7 @@ async function convertMMDToPDF(inputPath, scalePercentage = 100) {
   }
 }
 
-// รับพาธและเปอร์เซ็นต์การขยายจาก Command Line
+// Get the input path and scale percentage from the command line
 const inputPath = process.argv[2];
 const scalePercentage = parseFloat(process.argv[3]) || 100;
 
