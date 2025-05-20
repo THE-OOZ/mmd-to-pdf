@@ -1,0 +1,15 @@
+node_modules
+*.mmd
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.bmp
+*.tiff
+*.ico
+*.webm
+package-lock.json
+*.zip

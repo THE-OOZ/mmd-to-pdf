@@ -1,0 +1,20 @@
+{
+  "name": "mmd-to-pdf",
+  "version": "0.0.1",
+  "description": "mmd to pdf",
+  "keywords": [
+    "mmd",
+    "pdf"
+  ],
+  "license": "ISC",
+  "author": "ooz",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "dependencies": {
+    "mermaid": "^11.6.0",
+    "puppeteer": "^24.9.0"
+  }
+}
