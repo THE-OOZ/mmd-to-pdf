@@ -2,6 +2,22 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
+// Function to recursively get all .mmd files in a directory and its subdirectories
+function getAllMMDFiles(dir) {
+  let results = [];
+  const list = fs.readdirSync(dir);
+  list.forEach(file => {
+    const filePath = path.join(dir, file);
+    const stat = fs.statSync(filePath);
+    if (stat && stat.isDirectory()) {
+      results = results.concat(getAllMMDFiles(filePath));
+    } else if (file.endsWith('.mmd')) {
+      results.push(filePath);
+    }
+  });
+  return results;
+}
+
 // Function to generate HTML from a Mermaid Diagram
 function generateHTMLFromMermaid(mmdContent, scalePercentage = 100) {
   const scaleFactor = scalePercentage / 100;
@@ -92,21 +108,26 @@ async function convertHTMLToPDF(htmlContent, outputPDF, scalePercentage = 100) {
 }
 
 // Main function to convert .mmd files to PDF
-async function convertMMDToPDF(inputPath, scalePercentage = 100) {
-  const isDirectory = fs.lstatSync(inputPath).isDirectory();
-  const files = isDirectory
-    ? fs.readdirSync(inputPath).filter(file => file.endsWith('.mmd'))
-    : [path.basename(inputPath)];
+async function convertMMDToPDF(inputDir, outputDir, scalePercentage = 100) {
+  const files = getAllMMDFiles(inputDir);
 
-  const baseDir = isDirectory ? inputPath : path.dirname(inputPath);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 
   for (const file of files) {
-    const inputFile = path.join(baseDir, file);
-    const outputPDF = inputFile.replace(/\.mmd$/, '.pdf');
+    const relativePath = path.relative(inputDir, file);
+    const outputPDF = path.join(outputDir, relativePath.replace(/\.mmd$/, '.pdf'));
+
+    // Ensure the output directory structure exists
+    const outputPDFDir = path.dirname(outputPDF);
+    if (!fs.existsSync(outputPDFDir)) {
+      fs.mkdirSync(outputPDFDir, { recursive: true });
+    }
 
     try {
       console.log(`Processing: ${file}`);
-      const mmdContent = fs.readFileSync(inputFile, 'utf8');
+      const mmdContent = fs.readFileSync(file, 'utf8');
       const htmlContent = generateHTMLFromMermaid(mmdContent, scalePercentage);
       await convertHTMLToPDF(htmlContent, outputPDF, scalePercentage);
       console.log(`Converted: ${file} -> ${outputPDF}`);
@@ -116,15 +137,11 @@ async function convertMMDToPDF(inputPath, scalePercentage = 100) {
   }
 }
 
-// Get the input path and scale percentage from the command line
-const inputPath = process.argv[2];
-const scalePercentage = parseFloat(process.argv[3]) || 100;
+// Get the input and output paths and scale percentage from the command line
+const inputDir = path.resolve('mmd-file');
+const outputDir = path.resolve('output');
+const scalePercentage = parseFloat(process.argv[2]) || 100;
 
-if (!inputPath) {
-  console.error('Usage: node convertMMDToPDF.js <file-or-folder-path> [scale-percentage]');
-  process.exit(1);
-}
-
-convertMMDToPDF(inputPath, scalePercentage).then(() => {
+convertMMDToPDF(inputDir, outputDir, scalePercentage).then(() => {
   console.log('Conversion completed.');
 });
