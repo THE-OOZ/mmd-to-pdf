@@ -1,7 +1,7 @@
 # Installation and Usage Guide
 
 ## Description
-This project allows you to process Mermaid diagrams (`.mmd` files) and convert them into other formats such as PDF or SVG.
+This project allows you to process Mermaid diagrams (`.mmd` files) and convert them into PDF format. The application supports processing `.mmd` files from a specified input directory and its subdirectories, and saves the output in a structured `output/` directory.
 
 ## Installation
 
@@ -25,21 +25,30 @@ This project allows you to process Mermaid diagrams (`.mmd` files) and convert t
 
 ## Usage
 
-1. **Prepare Your Diagram File**  
-   Place your `.mmd` file (Mermaid diagram) in the designated input directory (e.g., `input/`).
+1. **Prepare Your Diagram Files**  
+   Place your `.mmd` files (Mermaid diagrams) in the `mmd-file/` directory. The application will automatically process all `.mmd` files in this directory and its subdirectories.
 
 2. **Run the Application**  
-   Execute the script to process the `.mmd` file:
+   Execute the script to process the `.mmd` files:
    ```bash
-   node main.js
+   node main.js [scale-percentage]
    ```
+   - Replace `[scale-percentage]` with the desired scaling percentage (default is `100` if not specified).
 
 3. **View the Output**  
-   The processed file (e.g., PDF or SVG) will be saved in the `output/` directory.
+   The processed PDF files will be saved in the `output/` directory, maintaining the same folder structure as the `mmd-file/` directory.
+
+## Example
+
+To process `.mmd` files with a scale percentage of 100:
+```bash
+node main.js 100
+```
 
 ## Notes
 
 - Ensure you have Node.js installed on your system.
 - For Mermaid syntax and examples, refer to the [Mermaid documentation](https://mermaid.js.org/).
+- The `output/` directory will be created automatically if it does not exist.
 
 Feel free to contact us if you encounter any issues or have questions!
