@@ -13,3 +13,5 @@ node_modules
 *.webm
 package-lock.json
 *.zip
+output
+mmd-file
